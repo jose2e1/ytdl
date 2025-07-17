@@ -4,6 +4,15 @@
     <title>YouTube Downloader</title>
 </head>
 <body>
-    <h1>Hello from Flask!</h1>
+    <h2>🎥 YouTube Downloader (No Server Storage)</h2>
+
+    <form method="POST">
+        <input type="text" name="url" placeholder="Paste YouTube link here" required>
+        <button type="submit">Download</button>
+    </form>
+
+    {% if error %}
+        <p style="color:red;">❌ {{ error }}</p>
+    {% endif %}
 </body>
 </html>

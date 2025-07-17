@@ -1,2 +1,2 @@
-Flask
-yt_dlp
+Flask==2.3.3
+pytube==15.0.0

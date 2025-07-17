@@ -1,29 +1,25 @@
-from flask import Flask, render_template, request, send_file
-import yt_dlp
-import os
+from flask import Flask, render_template, request, Response
+from pytube import YouTube
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        url = request.form['url']
+        try:
+            yt = YouTube(url)
+            stream = yt.streams.get_highest_resolution()
+            return Response(
+                stream.stream_to_buffer(),
+                mimetype='video/mp4',
+                headers={"Content-Disposition": f"attachment;filename={yt.title}.mp4"}
+            )
+        except Exception as e:
+            return render_template('index.html', error=str(e))
     return render_template('index.html')
 
-@app.route('/download', methods=['POST'])
-def download():
-    url = request.form['url']
-    ydl_opts = {
-        'outtmpl': 'downloads/%(title)s.%(ext)s',
-        'format': 'best',
-    }
-
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        filename = ydl.prepare_filename(info)
-
-    return send_file(filename, as_attachment=True)
-
-import os
-
 if __name__ == '__main__':
+    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
